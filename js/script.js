@@ -4,7 +4,7 @@ const global = {
     currentPage: window.location.pathname,
 };
 
-// Display the TOP 20 most popular movies
+/* Display the TOP 20 most popular movies */
 
 async function displayPopularMovies() {
     const {results} = await fetchAPIData('movie/popular');
@@ -41,7 +41,7 @@ async function displayPopularMovies() {
     });
 }
 
-// Display the TOP 20 most popular TV Shows
+/* Display the TOP 20 most popular TV Shows */
 
 async function displayPopularShows() {
     const {results} = await fetchAPIData('tv/popular');
@@ -78,33 +78,16 @@ async function displayPopularShows() {
     });
 }
 
-{/* <div class="card">
-          <a href="movie-details.html?id=1">
-            <img
-              src="images/no-image.jpg"
-              class="card-img-top"
-              alt="Movie Title"
-            />
-          </a>
-          <div class="card-body">
-            <h5 class="card-title">Movie Title</h5>
-            <p class="card-text">
-              <small class="text-muted">Release: XX/XX/XXXX</small>
-            </p>
-          </div>
-        </div> */}
-
-// Display Movie Details
+/*  Display Movie Details */
 
 async function displayMovieDetails(){
     const movieId = window.location.search.split('=')[1];
     const movie = await fetchAPIData(`movie/${movieId}`);
 
-    //Overlay for background image 
+    /* Overlay for background image  */
 displayBackgroundImage('movie',movie.backdrop_path);
 
     const div = document.createElement('div');
-    console.log(movieId);
     div.innerHTML = `
     <div class="details-top">
           <div>
@@ -157,17 +140,16 @@ displayBackgroundImage('movie',movie.backdrop_path);
         document.querySelector('#movie-details').appendChild(div);
 }
 
-// Display Show Details
+/* Display Show Details */
 
-async function displayshowDetails(){
+async function displayShowDetails(){
   const showId = window.location.search.split('=')[1];
   const show = await fetchAPIData(`tv/${showId}`);
 
-  //Overlay for background image 
+/*  Overlay for background image  */
 displayBackgroundImage('tv',show.backdrop_path);
 
   const div = document.createElement('div');
-  console.log(showId);
   div.innerHTML = `
   <div class="details-top">
         <div>
@@ -191,7 +173,7 @@ displayBackgroundImage('tv',show.backdrop_path);
             <i class="fas fa-star text-primary"></i>
             ${show.vote_average.toFixed(1)} / 10
           </p>
-          <p class="text-muted">Release Date: ${show.first_air_date}</p>
+          <p class="text-muted">Last Air Date: ${show.last_air_date}</p>
           <p>
             ${show.overview}
           </p>
@@ -205,9 +187,8 @@ displayBackgroundImage('tv',show.backdrop_path);
       <div class="details-bottom">
         <h2>Show Info</h2>
         <ul>
-          <li><span class="text-secondary">Budget:</span> $${addCommasToNumber(show.budget)}</li>
-          <li><span class="text-secondary">Revenue:</span> $${addCommasToNumber(show.revenue)}</li>
-          <li><span class="text-secondary">Runtime:</span> ${show.runtime} minutes</li>
+          <li><span class="text-secondary">Number Of Episodes:</span> ${show.number_of_episodes}</li>
+          <li><span class="text-secondary">Last Episode To Air:</span> ${show.last_episode_to_air.name}</li>
           <li><span class="text-secondary">Status:</span> ${show.status}</li>
         </ul>
         <h4>Production Companies</h4>
@@ -220,7 +201,7 @@ displayBackgroundImage('tv',show.backdrop_path);
       document.querySelector('#show-details').appendChild(div);
 }
 
-//Display Background On Details Page
+/* Display Background On Details Page */
 function displayBackgroundImage(type, backgroundPath) {
 const overlayDiv = document.createElement('div');
 overlayDiv.style.backgroundImage = `url(https://image.tmdb.org/t/p/original/${backgroundPath})`;
@@ -242,7 +223,32 @@ if (type === 'movie') {
 }
 }
 
-// Fetching data from the TMDB API (not production site so leaving the API key visible)
+
+/* Display Slider Movies */
+
+async function displaySlider() {
+  const { results } = await fetchAPIData('movie/now_playing');
+  console.log(results);
+
+  results.forEach((movie) => {
+    const div = document.createElement('div');
+    div.classList.add('swiper-slide');
+    div.innerHTML = `
+  <a href="movie-details.html?id=${movie.id}">
+  <img src="https:image.tmdb.org/t/p/w500${movie.poster_path})" alt="Movie Title"/>
+ </a>
+ <h4 class="swiper-rating">
+  <i class="fas fa-star text-secondary"></i> 8 / 10
+ </h4>
+  `
+  }); 
+}
+
+
+
+
+
+/* Fetching data from the TMDB API (not production site so leaving the API key visible) */
 
 async function fetchAPIData(endpoint) {
     const API_KEY = '046f4202b75a6373f9bb297990f4494e';
@@ -272,11 +278,11 @@ function highlightActiveLink() {
     });
 }
 
-//Formating number 22
+/*  Formating number */
 
-// function addCommasToNumber(number){
-//   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-// }
+function addCommasToNumber(number){
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 // Init app (router)
 
@@ -284,7 +290,7 @@ function init() {
     switch(global.currentPage) {
         case '/':
             case '/index.html':
-        console.log('Home');
+        displaySlider();
         displayPopularMovies();
         break;
         case '/shows.html':
@@ -295,7 +301,7 @@ function init() {
         displayMovieDetails();
         break;
         case '/tv-details.html':
-        displayshowDetails();
+        displayShowDetails();        
         break;
         case '/search.html':
         console.log('Search');
